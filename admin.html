@@ -2,45 +2,44 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Admin Upload</title>
+  <title>Admin Upload (Uploadcare)</title>
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/@uploadcare/file-uploader@1/web/uc-file-uploader-regular.min.css"
+  >
 </head>
 <body>
-  <h1>Upload fichier (admin)</h1>
-  <input type="password" id="password" placeholder="Mot de passe admin" /><br><br>
-  <input type="file" id="fileInput" /><br><br>
-  <button onclick="upload()">Uploader</button>
+  <h1>Uploader un fichier (admin)</h1>
+
+  <!-- Uploadcare Web Component -->
+  <uc-config
+    ctx-name="my-uploader"
+    pubkey="3a95022cfa5529c1f798"
+    use-cloud-image-editor="false"
+    source-list="local"
+  ></uc-config>
+
+  <uc-file-uploader-regular
+    ctx-name="my-uploader"
+    class="uc-light"
+  ></uc-file-uploader-regular>
+
+  <uc-upload-ctx-provider ctx-name="my-uploader"></uc-upload-ctx-provider>
+
   <pre id="result"></pre>
 
-  <script>
-    function upload() {
-      const pass = document.getElementById('password').value;
-      if (pass !== "admin123") {
-        alert("Mot de passe incorrect");
-        return;
-      }
-      const file = document.getElementById('fileInput').files[0];
-      if (!file) {
-        alert('Sélectionne un fichier');
-        return;
-      }
+  <script type="module">
+    import * as UC from 'https://cdn.jsdelivr.net/npm/@uploadcare/file-uploader@1/web/uc-file-uploader-regular.min.js';
+    UC.defineComponents(UC);
 
-      const formData = new FormData();
-      formData.append("UPLOADCARE_PUBLIC_KEY", "3a95022cfa5529c1f798");
-      formData.append("UPLOADCARE_STORE", "1");
-      formData.append("file", file);
+    const ctxProvider = document.querySelector("uc-upload-ctx-provider");
 
-      fetch("https://upload.uploadcare.com/base/", {
-        method: "POST",
-        body: formData
-      })
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById('result').textContent = "✅ Upload réussi : " + JSON.stringify(data, null, 2);
-      })
-      .catch(err => {
-        document.getElementById('result').textContent = "❌ Erreur : " + err;
-      });
-    }
+    ctxProvider.addEventListener("common-upload-success", (e) => {
+      const urls = e.detail.successEntries.map((entry) => entry.cdnUrl);
+      document.getElementById("result").textContent =
+        "✅ Upload réussi :\\n" + urls.join("\\n");
+      console.log("Uploaded files URL list", urls);
+    });
   </script>
 </body>
 </html>
