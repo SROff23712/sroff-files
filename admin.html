@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Upload</title>
+</head>
+<body>
+  <h1>Upload fichier (admin)</h1>
+  <input type="password" id="password" placeholder="Mot de passe admin" /><br><br>
+  <input type="file" id="fileInput" /><br><br>
+  <button onclick="upload()">Uploader</button>
+  <pre id="result"></pre>
+
+  <script>
+    function upload() {
+      const pass = document.getElementById('password').value;
+      if (pass !== "admin123") {
+        alert("Mot de passe incorrect");
+        return;
+      }
+      const file = document.getElementById('fileInput').files[0];
+      if (!file) {
+        alert('Sélectionne un fichier');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("UPLOADCARE_PUBLIC_KEY", "3a95022cfa5529c1f798");
+      formData.append("UPLOADCARE_STORE", "1");
+      formData.append("file", file);
+
+      fetch("https://upload.uploadcare.com/base/", {
+        method: "POST",
+        body: formData
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('result').textContent = "✅ Upload réussi : " + JSON.stringify(data, null, 2);
+      })
+      .catch(err => {
+        document.getElementById('result').textContent = "❌ Erreur : " + err;
+      });
+    }
+  </script>
+</body>
+</html>
