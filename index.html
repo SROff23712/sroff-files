@@ -2,15 +2,35 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Partage de fichiers</title>
+  <title>Fichiers partagés</title>
 </head>
 <body>
-  <h1>Fichiers partagés</h1>
-  <p>Les fichiers uploadés apparaîtront ici (à ajouter manuellement pour l’instant).</p>
-  <!-- Liste manuelle ou automatique plus tard -->
-  <ul>
-    <li><a href="https://ucarecdn.com/xxxxxx/image1.png" target="_blank">image1.png</a></li>
-    <li><a href="https://ucarecdn.com/yyyyyy/fichier.pdf" target="_blank">fichier.pdf</a></li>
-  </ul>
+  <h1>Fichiers disponibles</h1>
+  <ul id="file-list"></ul>
+
+  <script>
+    fetch("/fichiers.json")
+      .then(res => res.json())
+      .then(data => {
+        const ul = document.getElementById("file-list");
+        if (data.length === 0) {
+          ul.innerHTML = "<li>Aucun fichier pour le moment.</li>";
+        } else {
+          data.forEach(url => {
+            const li = document.createElement("li");
+            const a = document.createElement("a");
+            a.href = url;
+            a.textContent = url.split("/").pop();
+            a.target = "_blank";
+            li.appendChild(a);
+            ul.appendChild(li);
+          });
+        }
+      })
+      .catch(err => {
+        document.getElementById("file-list").innerHTML = "<li>Erreur de chargement.</li>";
+        console.error(err);
+      });
+  </script>
 </body>
 </html>

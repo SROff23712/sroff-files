@@ -9,9 +9,8 @@
   >
 </head>
 <body>
-  <h1>Uploader un fichier (admin)</h1>
+  <h1>Uploader un fichier</h1>
 
-  <!-- Uploadcare Web Component -->
   <uc-config
     ctx-name="my-uploader"
     pubkey="3a95022cfa5529c1f798"
@@ -37,8 +36,19 @@
     ctxProvider.addEventListener("common-upload-success", (e) => {
       const urls = e.detail.successEntries.map((entry) => entry.cdnUrl);
       document.getElementById("result").textContent =
-        "✅ Upload réussi :\\n" + urls.join("\\n");
-      console.log("Uploaded files URL list", urls);
+        "✅ Upload réussi :\n" + urls.join("\n");
+
+      // Appeler l’API Vercel pour enregistrer dans fichiers.json
+      urls.forEach(url => {
+        fetch("/api/add-url", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url })
+        })
+        .then(res => res.text())
+        .then(msg => console.log("Serveur:", msg))
+        .catch(err => console.error("Erreur API:", err));
+      });
     });
   </script>
 </body>
